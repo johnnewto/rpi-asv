@@ -24,8 +24,11 @@ The **Starlink Mini** revolutionizes the R/C hobby by enabling low-latency, high
 3. Launch Raspberry Pi Imager
 
 #### Configure and Flash the SD Card
-1. Click "Choose OS" and select "Raspberry Pi Bullseye OS Lite (32-bit)" for headless operation
-the newer 64 bit versions does not compile
+1. Click "Choose OS" and select "Raspberry Pi Bullseye OS Lite (32-bit)" for headless operation. Note that:
+   - The 32-bit version is recommended for compatibility with `mavlink-router` and Netbird.
+   - The 64-bit version may not work properly with `mavlink-router` as of the latest updates;
+   
+The newer 64 bit versions does not compile
 
 2. Click "Choose Storage" and select your SD card
 3. Click the gear icon (⚙️) to open advanced options:
@@ -140,9 +143,12 @@ To ensure persistent connections:
 4. Toggle off "Expiration" to keep the connection permanent
 
 
+Forfor more details See [Netbird setup instructions](NetBird.md) for details.
+
 ## Configure Mavlink router
 
 The configuration script generates and updates the `mavlink-router` configuration, sets up a systemd service, and enables routing with flexible endpoint settings.
+
 
 ### Usage
 1. **Run the configuration script:**
@@ -154,13 +160,9 @@ The configuration script generates and updates the `mavlink-router` configuratio
    - If an existing configuration is found, the script will use these values as defaults and show them to you
    - **UART Device**: Default is `/dev/ttyS0`. This is the default serial port on the Raspberry Pi
    - **Baud Rate**: Default is `57600`. This is the communication speed between the companion computer and connected devices
-   - **UDP Endpoints**: Default is `0.0.0.0:14550`. You can enter multiple endpoints separated by spaces (e.g., `100.110.200.3:14550 100.110.220.4:14550`), get these from the netbird pairs. 
+   - **UDP Endpoints**: Default is `0.0.0.0:14550`. You can enter multiple endpoints separated by spaces (e.g., `100.64.169.127:14550 100.64.238.129:14550`), get these from the netbird pairs. 
    
-   I think the pi should point to 
-   - `0.0.0.0:14550` 
-   
-   and QGC Connection 
-   - `Raspberrypi.netbird.cloud:14550`
+
 
 
 You can manually edit the configuration file if needed.
@@ -182,6 +184,7 @@ Final configuration file content will be something like :
    Address=100.64.238.129
    Port=14550
 ```
+For more details See [MAVLinkAnywhere](MAVLinkAnywhere.md).
 
 ## Troubleshooting
 
@@ -190,6 +193,5 @@ Final configuration file content will be something like :
 - **QGC Fails to Connect**: Ensure the correct IP/hostname and port are used, and check firewall settings.
 
 
-## License
-
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+## Stream video from a Raspberry Pi camera to QGroundControl (QGC) using GStreamer
+See [GStreamer setup instructions](gstreamer.md) for details.

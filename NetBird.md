@@ -49,3 +49,14 @@ To ensure persistent connections:
 4. Toggle off "Expiration" to keep the connection permanent
 
 ## Troubleshooting
+If you encounter issues with the NetBird installation or connection, consider the following troubleshooting steps:
+- **Check Network Connectivity**: Ensure your Raspberry Pi has a stable internet connection.
+- **Review Logs**: Use the command `sudo journalctl -u netbird` to view logs for any errors or warnings.
+- **Reinstall NetBird**: If problems persist, you can try reinstalling NetBird:
+  ```bash
+  sudo netbird down
+  curl -fsSL https://pkgs.netbird.io/install.sh | sh
+  ```
+- **Consult NetBird Documentation**: Refer to the [NetBird Docs](https://docs.netbird.io) for detailed troubleshooting guides and FAQs.
+en-source VPN solution that allows secure peer-to-peer connections. This guide provides step-by-step instructions for installing NetBird on a Raspberry Pi, ensuring it works seamlessly with the ARM architecture.
+

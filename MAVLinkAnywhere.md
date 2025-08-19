@@ -85,7 +85,7 @@ The configuration script generates and updates the `mavlink-router` configuratio
    - If an existing configuration is found, the script will use these values as defaults and show them to you
    - **UART Device**: Default is `/dev/ttyS0`. This is the default serial port on the Raspberry Pi
    - **Baud Rate**: Default is `57600`. This is the communication speed between the companion computer and connected devices
-   - **UDP Endpoints**: Default is `0.0.0.0:14550`. You can enter multiple endpoints separated by spaces (e.g., `100.110.200.3:14550 100.110.220.4:14550`)
+   - **UDP Endpoints**: Default is `0.0.0.0:14550`. You can enter multiple endpoints separated by spaces (e.g., `100.64.169.127:14550 100.64.238.129:14550 192.168.1.215:14550`), get these from the netbird pairs. 
 
 ### What the Configuration Script Does:
 - Prompts the user to enable UART and disable the serial console using `raspi-config`
@@ -98,6 +98,29 @@ The configuration script generates and updates the `mavlink-router` configuratio
 - Creates a systemd service file to manage the `mavlink-router` service
 - Reloads systemd, enables, and starts the `mavlink-router` service
 
+You can manually edit the configuration file if needed.
+Final configuration file content will be something like :
+```
+   [General]
+   TcpServerPort=5760
+   ReportStats=false
+
+   [UartEndpoint uart]
+   Device=/dev/ttyS0
+   Baud=57600
+   [UdpEndpoint udp1]
+   Mode=normal
+   Address=100.64.169.127
+   Port=14550
+   [UdpEndpoint udp2]
+   Mode=normal
+   Address=100.64.238.129
+   Port=14550
+   [UdpEndpoint udp3]
+   Mode=normal
+   Address=192.168.1.215
+   Port=14550
+```
 ### Monitoring and Logs
 - **Check the status of the service:**
   ```sh
@@ -107,6 +130,79 @@ The configuration script generates and updates the `mavlink-router` configuratio
   ```sh
   sudo journalctl -u mavlink-router -f
   ```
+```
+pi@raspberrypi:~ $ sudo journalctl -u mavlink-router -f
+-- Journal begins at Tue 2025-05-06 14:35:26 BST. --
+Jun 14 23:48:09 raspberrypi systemd[1]: Stopping MAVLink Router Service...
+Jun 14 23:48:09 raspberrypi systemd[1]: mavlink-router.service: Succeeded.
+Jun 14 23:48:09 raspberrypi systemd[1]: Stopped MAVLink Router Service.
+-- Boot 7381f1929a1e468b9cd0c27cede22d39 --
+Jun 14 23:48:18 raspberrypi systemd[1]: Started MAVLink Router Service.
+Jun 14 23:48:19 raspberrypi mavlink-routerd[446]: mavlink-router version v4-15-g51983a4
+Jun 14 23:48:19 raspberrypi mavlink-routerd[446]: Opened UART [4]uart: /dev/ttyS0
+Jun 14 23:48:19 raspberrypi mavlink-routerd[446]: UART [4]uart: speed = 57600
+Jun 14 23:48:19 raspberrypi mavlink-routerd[446]: Opened UDP Client [5]udp2: 100.64.238.129:14550
+Jun 14 23:48:19 raspberrypi mavlink-routerd[446]: Opened UDP Client [7]udp1: 100.64.169.127:14550
+Jun 14 23:48:19 raspberrypi mavlink-routerd[446]: Opened TCP Server [9] [::]:5760
+```
+
+### Troubleshooting
+- **Check mavlink router reports:**
+  If you encounter issues, you can check the status of the `mavlink-router` service using:
+  ```sh
+  mavlink-routerd -r 
+  ```
+  You should see output similar to the following, indicating the status of your endpoints and any received messages form the flight controller:
+```sh
+pi@raspberrypi:~/mavlink-anywhere $ mavlink-routerd -r
+mavlink-router version v4-15-g51983a4
+Opened UART [4]uart: /dev/serial0
+UART [4]uart: speed = 57600
+Opened UDP Client [5]udp2: 100.64.238.129:14550
+Opened UDP Client [7]udp1: 100.64.169.127:14550
+TCP Server: Could not bind to tcp socket (Address already in use)
+UART Endpoint [4]uart {
+   Received messages {
+      CRC error: 3 1% 0KB
+      Sequence lost: 250 89%
+      Handled: 25 0KB
+      Total: 278
+   }
+   Transmitted messages {
+      Total: 3 0KB
+   }
+}
+UDP Endpoint [5]udp2 {
+   Received messages {
+      CRC error: 0 0% 0KB
+      Sequence lost: 0 0%
+      Handled: 0 0KB
+      Total: 0
+   }
+   Transmitted messages {
+      Total: 26 0KB
+   }
+}
+
+```
+
+### Connect to raspberry pi via SSH
+If you are using a VPN solution like NetBird, you can connect to your Raspberry Pi via SSH using the assigned IP address. For example:
+```sh
+# ssh pi@<assigned-ip-address>
+ssh pi@raspberrypi-1.netbird.cloud
+```
+if this does not work, you can try the following command:
+```sh
+ping raspberrypi-1.netbird.cloud
+```
+
+If there is a fightcontrooler connected to the Raspberry Pi, you can check the MAVLink connection using:
+```sh
+mavlink-router-cli status
+```
+
+
 
 ### Connecting with QGroundControl
 Use QGroundControl to connect to your companion computer's IP address on the configured UDP endpoints. For internet-based telemetry, make sure to follow the setup video to properly register your devices on your chosen VPN system or configure port forwarding on your router.
@@ -114,31 +210,6 @@ Use QGroundControl to connect to your companion computer's IP address on the con
 ## Contact
 For more information, visit the [GitHub Repo](https://github.com/alireza787b/mavlink-anywhere).
 
-## Related Resources
-- [Smart WiFi Manager Project](https://github.com/alireza787b/smart-wifi-manager)
-- [NetBird VPN](https://netbird.io/)
-- [Original 2020 Tutorial (Legacy Method)](https://www.youtube.com/watch?v=WoRce4Re3Wg)
 
-## Support
-If you encounter any issues, please:
-1. Check the video tutorial timestamps for specific setup steps
-2. Review the relevant sections in this documentation
-3. Open an issue on GitHub with detailed information about your setup
 
-## Keywords
-- MAVLink
-- Raspberry Pi
-- Drone Communication
-- UAV
-- mavlink-router
-- UART
-- UDP
-- TCP
-- QGroundControl
-- Drone Telemetry
-- Remote Telemetry
-- VPN
-- NetBird
-- WireGuard
-- Smart WiFi
-- 4G Telemetry
+
