@@ -1,4 +1,10 @@
-# MAVLinkAnywhere
+
+# replace this with normal install, not the root install one given here'
+
+ie 
+https://bellergy.com/6-install-and-setup-mavlink-router/
+
+# MAVLinkAnywhere  (replace this as in root install)
 
 MAVLinkAnywhere is a general-purpose project that enables MAVLink data streaming to both local endpoints and remote locations over the internet. This project provides simplified scripts to install and configure `mavlink-router` on companion computers (Raspberry Pi, Jetson, etc.). `mavlink-router` is a powerful application that routes MAVLink packets between various endpoints, including UART, UDP, and TCP, making it ideal for MAVLink based UAV (PX4, Ardupilot, etc.) and drone communication systems.
 
@@ -144,6 +150,38 @@ Jun 14 23:48:19 raspberrypi mavlink-routerd[446]: UART [4]uart: speed = 57600
 Jun 14 23:48:19 raspberrypi mavlink-routerd[446]: Opened UDP Client [5]udp2: 100.64.238.129:14550
 Jun 14 23:48:19 raspberrypi mavlink-routerd[446]: Opened UDP Client [7]udp1: 100.64.169.127:14550
 Jun 14 23:48:19 raspberrypi mavlink-routerd[446]: Opened TCP Server [9] [::]:5760
+```
+
+
+### Excessive Logging
+example Mavlink Router which sends errors if a UDP endpoint is not reachable.
+If you have a service that is logging excessively, you can limit its log size by editing its systemd service file. For example, for `mavlink-router`, you can edtit the service file:
+``` sh
+sudo systemctl edit mavlink-router
+```
+And add the following lines to limit the log size:
+``` conf
+[Service]
+LogLevelMax=2
+         
+```
+This sets the maximum log level to 2, which is "critical" level. You can adjust the level as needed (0 for emergency, 1 for alert, 2 for critical, 3 for error, 4 for warning, 5 for notice, 6 for info, and 7 for debug).
+
+Restart the service to apply the changes:
+``` sh
+sudo systemctl daemon-reload
+sudo systemctl restart mavlink-router
+```
+
+Check the journal logs to see if the changes have taken effect:
+``` sh
+# To see the latest logs for mavlink-router:
+sudo journalctl -u mavlink-router -e
+# To follow the logs in real-time:
+sudo journalctl -u mavlink-router -f
+
+# or to see the last 10 lines:
+sudo journalctl -u mavlink-router -n10
 ```
 
 ### Troubleshooting

@@ -44,8 +44,22 @@ gst-launch-1.0 libcamerasrc ! video/x-raw, width=640, height=480, framerate=30/1
 ### To stream video from a Raspberry Pi camera to QGroundControl (QGC) using GStreamer
 For Raspberry Pi OS Bullseye with libcamera use the following pipeline to stream H.264 video over UDP to QGC:
 ``` sh
-gst-launch-1.0 libcamerasrc ! capsfilter caps=video/x-raw,format=NV12,framerate=10/1 ! v4l2convert ! capsfilter caps=video/x-raw,width=1280,height=1080 ! v4l2h264enc extra-controls="controls,video_bitrate_mode=0,video_bitrate=5000000,h264_i_frame_period=10,h264_profile=4" ! 'video/x-h264,level=(string)4' ! h264parse ! rtph264pay ! udpsink host=john-PC port=5600 sync=0
+gst-launch-1.0 libcamerasrc ! capsfilter caps=video/x-raw,format=NV12,framerate=10/1 ! v4l2convert ! capsfilter caps=video/x-raw,width=1280,height=720 ! v4l2h264enc extra-controls="controls,video_bitrate_mode=0,video_bitrate=5000000,h264_i_frame_period=10,h264_profile=4" ! 'video/x-h264,level=(string)4' ! h264parse  config-interval=1 ! rtph264pay ! udpsink host=100.64.169.127 port=5600 sync=0
 ```
 
 QGroundControl can then connect to the stream 
+
+Lower resolution and bitrate if you have a slow network connection or if you want to reduce the load on the Raspberry Pi. For example, you can change the width and height to 640x480 and the bitrate to 400Mbps:
+``` sh
+gst-launch-1.0 libcamerasrc ! capsfilter caps=video/x-raw,format=NV12,framerate=10/1 ! v4l2convert ! capsfilter caps=video/x-raw,width=640,height=480 ! v4l2h264enc extra-controls="controls,video_bitrate_mode=0,video_bitrate=400000,h264_i_frame_period=10,h264_profile=4" ! 'video/x-h264,level=(string)4' ! h264parse  config-interval=1 ! rtph264pay ! udpsink host=100.64.169.127 port=5600 sync=0
+```
+
+
+### PC test the stream
+You can test the stream on a PC using the following command:
+This command listens for the UDP stream on port 5600, depayloads the RTP packets, parses the H.264 video, decodes it, converts the video format, and displays it in a video sink.
+``` sh
+gst-launch-1.0 -v udpsrc port=5600 ! "application/x-rtp, media=(string)video, clock-rate=(int)90000, encoding-name=(string)H264, payload=(int)96" ! rtph264depay ! h264parse ! decodebin ! videoconvert ! autovideosink sync=false
+
+```
 

@@ -195,3 +195,6 @@ For more details See [MAVLinkAnywhere](MAVLinkAnywhere.md).
 
 ## Stream video from a Raspberry Pi camera to QGroundControl (QGC) using GStreamer
 See [GStreamer setup instructions](gstreamer.md) for details.
+
+## To Reduce Write To SD Card
+See [ReduceWriteToSDCard](ReduceWriteToSDCard.md) for details.
